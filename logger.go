@@ -7,69 +7,67 @@ import (
 	. "github.com/logrusorgru/aurora"
 	"log"
 	"os"
-	//"net"
 )
 
 type Level string
 
-var Constructor = NewLog()
+var Constructor = NewLog(FileDepth(2))
 
 var StdLogger = Constructor.Log()
 
-func Fatal(message interface{}, params ...interface{}){
+func Fatal(message interface{}, params ...interface{}) {
 	StdLogger.Fatal(message, params...)
 }
 
-func Error(message interface{}, params ...interface{}){
+func Error(message interface{}, params ...interface{}) {
 	StdLogger.Error(message, params...)
 }
 
-func Warn(message interface{}, params ...interface{}){
+func Warn(message interface{}, params ...interface{}) {
 	StdLogger.Warn(message, params...)
 }
 
-func Debug(message interface{}, params ...interface{}){
+func Debug(message interface{}, params ...interface{}) {
 	StdLogger.Debug(message, params...)
 }
 
-func Info(message interface{}, params ...interface{}){
+func Info(message interface{}, params ...interface{}) {
 	StdLogger.Info(message, params...)
 }
 
-func Trace(message interface{}, params ...interface{}){
+func Trace(message interface{}, params ...interface{}) {
 	StdLogger.Trace(message, params...)
 }
 
-func FatalContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.FatalContext(ctx , message, params...)
+func FatalContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.FatalContext(ctx, message, params...)
 }
 
-func ErrorContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.ErrorContext(ctx , message, params...)
+func ErrorContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.ErrorContext(ctx, message, params...)
 }
 
-func WarnContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.WarnContext(ctx , message, params...)
+func WarnContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.WarnContext(ctx, message, params...)
 }
 
-func DebugContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.DebugContext(ctx , message, params...)
+func DebugContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.DebugContext(ctx, message, params...)
 }
 
-func InfoContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.InfoContext(ctx , message, params...)
+func InfoContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.InfoContext(ctx, message, params...)
 }
 
-func TraceContext(ctx context.Context , message interface{}, params ...interface{}){
-	StdLogger.TraceContext(ctx , message, params...)
+func TraceContext(ctx context.Context, message interface{}, params ...interface{}) {
+	StdLogger.TraceContext(ctx, message, params...)
 }
-
 
 const (
 	FATAL Level = `FATAL`
 	ERROR Level = `ERROR`
-	WARN Level = `WARN`
-	INFO Level = `INFO`
+	WARN  Level = `WARN`
+	INFO  Level = `INFO`
 	DEBUG Level = `DEBUG`
 	TRACE Level = `TRACE`
 )
@@ -114,12 +112,12 @@ type Logger interface {
 	Debug(message interface{}, params ...interface{})
 	Info(message interface{}, params ...interface{})
 	Trace(message interface{}, params ...interface{})
-	FatalContext(ctx context.Context , message interface{}, params ...interface{})
-	ErrorContext(ctx context.Context , message interface{}, params ...interface{})
-	WarnContext(ctx context.Context , message interface{}, params ...interface{})
-	DebugContext(ctx context.Context , message interface{}, params ...interface{})
-	InfoContext(ctx context.Context , message interface{}, params ...interface{})
-	TraceContext(ctx context.Context , message interface{}, params ...interface{})
+	FatalContext(ctx context.Context, message interface{}, params ...interface{})
+	ErrorContext(ctx context.Context, message interface{}, params ...interface{})
+	WarnContext(ctx context.Context, message interface{}, params ...interface{})
+	DebugContext(ctx context.Context, message interface{}, params ...interface{})
+	InfoContext(ctx context.Context, message interface{}, params ...interface{})
+	TraceContext(ctx context.Context, message interface{}, params ...interface{})
 	SimpleLogger
 }
 
@@ -130,12 +128,12 @@ type PrefixedLogger interface {
 	Debug(prefix string, message interface{}, params ...interface{})
 	Info(prefix string, message interface{}, params ...interface{})
 	Trace(prefix string, message interface{}, params ...interface{})
-	FatalContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
-	ErrorContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
-	WarnContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
-	DebugContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
-	InfoContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
-	TraceContext(prefix string, ctx context.Context , message interface{}, params ...interface{})
+	FatalContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
+	ErrorContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
+	WarnContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
+	DebugContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
+	InfoContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
+	TraceContext(ctx context.Context, prefix string, message interface{}, params ...interface{})
 	SimpleLogger
 }
 
@@ -150,33 +148,33 @@ type logIpl struct {
 	*logOptions
 }
 
-func NewLog(options ...Option) Log  {
+func NewLog(options ...Option) Log {
 	opts := new(logOptions)
 	opts.applyDefault()
 	opts.apply(options...)
 	return &logIpl{
-		log: log.New(os.Stdout, ``, log.LstdFlags|log.Lmicroseconds),
+		log:        log.New(os.Stdout, ``, log.LstdFlags|log.Lmicroseconds),
 		logOptions: opts,
 	}
 }
 
 type logOptions struct {
-	prefix string
+	prefix    string
 	colors    bool
 	logLevel  Level
 	filePath  bool
 	fileDepth int
 }
 
-func (lOpts *logOptions) applyDefault()  {
+func (lOpts *logOptions) applyDefault() {
 	lOpts.fileDepth = 2
 	lOpts.colors = true
 	lOpts.logLevel = TRACE
 	lOpts.filePath = true
 }
 
-func (lOpts *logOptions) apply(options ...Option)  {
-	for _, opt := range options{
+func (lOpts *logOptions) apply(options ...Option) {
+	for _, opt := range options {
 		opt(lOpts)
 	}
 }
@@ -197,7 +195,7 @@ func WithFilePath() Option {
 
 func Prefixed(prefix string) Option {
 	return func(opts *logOptions) {
-		opts.prefix = prefix+`.`
+		opts.prefix = prefix + `.`
 	}
 }
 
@@ -213,7 +211,7 @@ func (l *logIpl) Log(options ...Option) Logger {
 	return &logger{
 		logParser: logParser{
 			logOptions: l.logOptions,
-			log: l.log,
+			log:        l.log,
 		},
 	}
 }
@@ -228,7 +226,7 @@ func (l *logIpl) PrefixedLog(options ...Option) PrefixedLogger {
 	return &prefixedLogger{
 		logParser: logParser{
 			logOptions: l.logOptions,
-			log: l.log,
+			log:        l.log,
 		},
 	}
 }
@@ -236,7 +234,6 @@ func (l *logIpl) PrefixedLog(options ...Option) PrefixedLogger {
 type logger struct {
 	logParser
 }
-
 
 func (l *logger) ErrorContext(ctx context.Context, message interface{}, params ...interface{}) {
 	l.logEntryContext(err, ctx, message, l.colored(`ERROR`), params...)
@@ -290,16 +287,14 @@ func (l *logger) FatalContext(ctx context.Context, message interface{}, params .
 	l.logEntry(fatal, uuid.New(), message, l.colored(`FATAL`), params)
 }
 
-func (l *logger)  Print(v ...interface{}){
+func (l *logger) Print(v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
 }
 
-func (l *logger)  Printf(format string, v ...interface{}){
+func (l *logger) Printf(format string, v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), fmt.Sprintf(format, v), l.colored(`INFO`))
 }
 
-func (l *logger)  Println(v ...interface{}){
+func (l *logger) Println(v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
 }
-
-

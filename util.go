@@ -50,6 +50,7 @@ func uuidFromContext(ctx context.Context) uuid.UUID {
 	if !ok {
 		return uuid.New()
 	}
+
 	return traceableCtx.UUID()
 }
 
