@@ -5,8 +5,6 @@ import (
 	log2 "gitlab.mytaxi.lk/pickme/go/log/example/log"
 )
 
-
-
 func main() {
 
 	log.Constructor = log.NewLog(log.WithLevel(log.INFO))
@@ -19,4 +17,5 @@ func main() {
 
 	otherLogger.Info(123123)
 	otherLogger.Trace(123123)
+
 }

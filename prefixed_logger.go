@@ -10,23 +10,23 @@ type prefixedLogger struct {
 	logParser
 }
 
-func (l *prefixedLogger) ErrorContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) ErrorContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntryContext(err, ctx, WithPrefix(prefix, message), l.colored(`ERROR`), params...)
 }
 
-func (l *prefixedLogger) WarnContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) WarnContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntryContext(warn, ctx, WithPrefix(prefix, message), l.colored(`WARN`), params...)
 }
 
-func (l *prefixedLogger) InfoContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) InfoContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntryContext(info, ctx, WithPrefix(prefix, message), l.colored(`INFO`), params...)
 }
 
-func (l *prefixedLogger) DebugContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) DebugContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntryContext(debug, ctx, WithPrefix(prefix, message), l.colored(`DEBUG`), params...)
 }
 
-func (l *prefixedLogger) TraceContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) TraceContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntryContext(trace, ctx, WithPrefix(prefix, message), l.colored(`TRACE`), params...)
 }
 
@@ -58,18 +58,18 @@ func (l *prefixedLogger) Fatalln(prefix string, message interface{}, params ...i
 	l.logEntry(fatal, uuid.New(), WithPrefix(prefix, message), l.colored(`FATAL`), params...)
 }
 
-func (l *prefixedLogger) FatalContext(prefix string, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *prefixedLogger) FatalContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
 	l.logEntry(fatal, uuid.New(), WithPrefix(prefix, message), l.colored(`FATAL`), params)
 }
 
-func (l *prefixedLogger)  Print(v ...interface{}){
+func (l *prefixedLogger) Print(v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
 }
 
-func (l *prefixedLogger)  Printf(format string, v ...interface{}){
+func (l *prefixedLogger) Printf(format string, v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), fmt.Sprintf(format, v), l.colored(`INFO`))
 }
 
-func (l *prefixedLogger)  Println(v ...interface{}){
+func (l *prefixedLogger) Println(v ...interface{}) {
 	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
 }
