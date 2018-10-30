@@ -13,7 +13,7 @@ type Level string
 
 var Constructor = NewLog(FileDepth(2))
 
-var StdLogger = Constructor.Log()
+var StdLogger = Constructor.Log(FileDepth(3))
 
 func Fatal(message interface{}, params ...interface{}) {
 	StdLogger.Fatal(message, params...)
