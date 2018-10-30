@@ -46,12 +46,12 @@ func WithPrefix(p string, message interface{}) string {
 }
 
 func uuidFromContext(ctx context.Context) uuid.UUID {
-	traceableCtx, ok := ctx.(tContext.TraceableContext)
-	if !ok {
+	uid := tContext.FromContext(ctx)
+	if uid == uuid.Nil {
 		return uuid.New()
 	}
 
-	return traceableCtx.UUID()
+	return uid
 }
 
 func (l *logParser) logEntry(logType string, uuid uuid.UUID, message interface{}, color string, params ...interface{}) {
