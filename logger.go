@@ -152,6 +152,7 @@ func NewLog(options ...Option) Log {
 	opts := new(logOptions)
 	opts.applyDefault()
 	opts.apply(options...)
+
 	return &logIpl{
 		log:        log.New(os.Stdout, ``, log.LstdFlags|log.Lmicroseconds),
 		logOptions: opts,
@@ -173,6 +174,15 @@ func (lOpts *logOptions) applyDefault() {
 	lOpts.filePath = true
 }
 
+func (lOpts *logOptions) copy() *logOptions {
+	return &logOptions{
+		fileDepth: lOpts.fileDepth,
+		colors:    lOpts.colors,
+		logLevel:  lOpts.logLevel,
+		filePath:  lOpts.filePath,
+	}
+}
+
 func (lOpts *logOptions) apply(options ...Option) {
 	for _, opt := range options {
 		opt(lOpts)
@@ -187,15 +197,21 @@ func FileDepth(d int) Option {
 	}
 }
 
-func WithFilePath() Option {
+func WithFilePath(enabled bool) Option {
 	return func(opts *logOptions) {
-		opts.filePath = true
+		opts.filePath = enabled
 	}
 }
 
 func Prefixed(prefix string) Option {
 	return func(opts *logOptions) {
 		opts.prefix = prefix + `.`
+	}
+}
+
+func WithColors(enabled bool) Option {
+	return func(opts *logOptions) {
+		opts.colors = enabled
 	}
 }
 
@@ -206,11 +222,13 @@ func WithLevel(level Level) Option {
 }
 
 func (l *logIpl) Log(options ...Option) Logger {
-	l.logOptions.applyDefault()
-	l.logOptions.apply(options...)
+
+	opts := l.logOptions.copy()
+	opts.apply(options...)
+
 	return &logger{
 		logParser: logParser{
-			logOptions: l.logOptions,
+			logOptions: opts,
 			log:        l.log,
 		},
 	}
@@ -221,11 +239,12 @@ func (*logIpl) SimpleLog() SimpleLogger {
 }
 
 func (l *logIpl) PrefixedLog(options ...Option) PrefixedLogger {
-	l.logOptions.applyDefault()
-	l.logOptions.apply(options...)
+	opts := l.logOptions.copy()
+	opts.apply(options...)
+
 	return &prefixedLogger{
 		logParser: logParser{
-			logOptions: l.logOptions,
+			logOptions: opts,
 			log:        l.log,
 		},
 	}
