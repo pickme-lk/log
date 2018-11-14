@@ -11,7 +11,7 @@ import (
 
 type Level string
 
-var Constructor = NewLog(FileDepth(2))
+var Constructor = NewLog(FileDepth(2), WithLevel(Level(os.Getenv(`LOGGER_LEVEL`))))
 
 var StdLogger = Constructor.Log(FileDepth(3))
 
