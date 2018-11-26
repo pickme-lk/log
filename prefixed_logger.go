@@ -11,23 +11,23 @@ type prefixedLogger struct {
 }
 
 func (l *prefixedLogger) ErrorContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
-	l.logEntryContext(err, ctx, WithPrefix(prefix, message), l.colored(`ERROR`), params...)
+	l.logEntry(err, uuidFromContext(ctx), WithPrefix(prefix, message), l.colored(`ERROR`), params...)
 }
 
 func (l *prefixedLogger) WarnContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
-	l.logEntryContext(warn, ctx, WithPrefix(prefix, message), l.colored(`WARN`), params...)
+	l.logEntry(warn, uuidFromContext(ctx), WithPrefix(prefix, message), l.colored(`WARN`), params...)
 }
 
 func (l *prefixedLogger) InfoContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
-	l.logEntryContext(info, ctx, WithPrefix(prefix, message), l.colored(`INFO`), params...)
+	l.logEntry(info, uuidFromContext(ctx), WithPrefix(prefix, message), l.colored(`INFO`), params...)
 }
 
 func (l *prefixedLogger) DebugContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
-	l.logEntryContext(debug, ctx, WithPrefix(prefix, message), l.colored(`DEBUG`), params...)
+	l.logEntry(debug, uuidFromContext(ctx), WithPrefix(prefix, message), l.colored(`DEBUG`), params...)
 }
 
 func (l *prefixedLogger) TraceContext(ctx context.Context, prefix string, message interface{}, params ...interface{}) {
-	l.logEntryContext(trace, ctx, WithPrefix(prefix, message), l.colored(`TRACE`), params...)
+	l.logEntry(trace, uuidFromContext(ctx), WithPrefix(prefix, message), l.colored(`TRACE`), params...)
 }
 
 func (l *prefixedLogger) Error(prefix string, message interface{}, params ...interface{}) {

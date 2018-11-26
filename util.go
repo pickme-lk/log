@@ -37,9 +37,9 @@ func (l *logParser) toString(id string, typ string, message interface{}, params 
 		fmt.Sprintf("%+v", params))
 }
 
-func (l *logParser) logEntryContext(logType string, ctx context.Context, message interface{}, color string, params ...interface{}) {
-	l.logEntry(logType, uuidFromContext(ctx), message, color, params...)
-}
+//func (l *logParser) logEntryContext(logType string, ctx context.Context, message interface{}, color string, params ...interface{}) {
+//	l.logEntry(logType, uuidFromContext(ctx), message, color, params...)
+//}
 
 func WithPrefix(p string, message interface{}) string {
 	return fmt.Sprintf(`%s] [%+v`, p, message)

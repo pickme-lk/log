@@ -11,7 +11,7 @@ import (
 
 type Level string
 
-var Constructor = NewLog(FileDepth(2), WithLevel(Level(os.Getenv(`LOGGER_LEVEL`))))
+var Constructor = NewLog(FileDepth(2))
 
 var StdLogger = Constructor.Log(FileDepth(3))
 
@@ -255,23 +255,23 @@ type logger struct {
 }
 
 func (l *logger) ErrorContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntryContext(err, ctx, message, l.colored(`ERROR`), params...)
+	l.logEntry(err, uuidFromContext(ctx), message, l.colored(`ERROR`), params...)
 }
 
 func (l *logger) WarnContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntryContext(warn, ctx, message, l.colored(`WARN`), params...)
+	l.logEntry(warn, uuidFromContext(ctx), message, l.colored(`WARN`), params...)
 }
 
 func (l *logger) InfoContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntryContext(info, ctx, message, l.colored(`INFO`), params...)
+	l.logEntry(info, uuidFromContext(ctx), message, l.colored(`INFO`), params...)
 }
 
 func (l *logger) DebugContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntryContext(debug, ctx, message, l.colored(`DEBUG`), params...)
+	l.logEntry(debug, uuidFromContext(ctx), message, l.colored(`DEBUG`), params...)
 }
 
 func (l *logger) TraceContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntryContext(trace, ctx, message, l.colored(`TRACE`), params...)
+	l.logEntry(trace, uuidFromContext(ctx), message, l.colored(`TRACE`), params...)
 }
 
 func (l *logger) Error(message interface{}, params ...interface{}) {
