@@ -9,37 +9,39 @@ import (
 	"runtime"
 )
 
+type logMessage struct {
+	typ     string
+	color   string
+	message interface{}
+	uuid    string
+	file    string
+	line    int
+}
+
 type logParser struct {
 	*logOptions
 	log *log.Logger
 }
 
 //isLoggable Check whether the log type is loggable under current configurations
-func (l *logParser) isLoggable(logType string) bool {
-	return logTypes[logType] <= logTypes[string(l.logLevel)]
+func (l *logParser) isLoggable(level Level) bool {
+	return logTypes[level] <= logTypes[l.logLevel]
 }
 
-func (l *logParser) colored(typ string) string {
+func (l *logParser) colored(level Level) string {
 	if l.colors {
-		return logColors[typ]
+		return string(logColors[level])
 	}
 
-	return typ
+	return string(level)
 }
 
-func (l *logParser) toString(id string, typ string, message interface{}, params ...interface{}) string {
-
-	var messageFmt = "%s %s %v"
-
-	return fmt.Sprintf(messageFmt,
-		typ,
-		fmt.Sprintf("%+v", message),
-		fmt.Sprintf("%+v", params))
+func (l *logParser) toString(logMsg *logMessage, params ...interface{}) string {
+	if len(params) > 0 {
+		return fmt.Sprintf("%s [%s] [%+v on %s line %d] %+v", logMsg.typ, logMsg.uuid, logMsg.message, logMsg.file, logMsg.line, params)
+	}
+	return fmt.Sprintf("%s [%s] [%+v on %s line %d]", logMsg.typ, logMsg.uuid, logMsg.message, logMsg.file, logMsg.line)
 }
-
-//func (l *logParser) logEntryContext(logType string, ctx context.Context, message interface{}, color string, params ...interface{}) {
-//	l.logEntry(logType, uuidFromContext(ctx), message, color, params...)
-//}
 
 func WithPrefix(p string, message interface{}) string {
 	return fmt.Sprintf(`%s] [%+v`, p, message)
@@ -54,14 +56,32 @@ func uuidFromContext(ctx context.Context) uuid.UUID {
 	return uid
 }
 
-func (l *logParser) logEntry(logType string, uuid uuid.UUID, message interface{}, color string, params ...interface{}) {
+func (l *logParser) logEntry(level Level, ctx context.Context, message interface{}, params ...interface{}) {
 
-	if !l.isLoggable(logType) {
+	if !l.isLoggable(level) {
 		return
 	}
 
-	var file string
-	var line int
+	var uid uuid.UUID
+
+	if ctx != nil {
+		uid = uuidFromContext(ctx)
+	} else {
+		uid = uuid.New()
+	}
+
+	logLevel := string(level)
+
+	if l.colors {
+		logLevel = l.colored(level)
+	}
+
+	logMsg := &logMessage{
+		typ:     logLevel,
+		message: message,
+		uuid:    uid.String(),
+	}
+
 	if l.filePath {
 		_, f, l, ok := runtime.Caller(l.fileDepth)
 		if !ok {
@@ -69,22 +89,18 @@ func (l *logParser) logEntry(logType string, uuid uuid.UUID, message interface{}
 			l = 1
 		}
 
-		file = f
-		line = l
+		logMsg.file = f
+		logMsg.line = l
 
-		message = fmt.Sprintf(`[%s] [%+v on %s %d]`, uuid.String(), message, file, line)
+		//message = fmt.Sprintf(`[%s] [%+v on %s %d]`, uid.String(), message, file, line)
+
 	} else {
-		message = fmt.Sprintf(`[%s] [%+v]`, uuid.String(), message)
+		//message = fmt.Sprintf(`[%s] [%+v]`, uid.String(), message)
 	}
 
-	if logType == fatal {
-		l.log.Fatalln(l.toString(``, color, message, params...))
+	if level == FATAL {
+		l.log.Fatalln(l.toString(logMsg, params...))
 	}
 
-	if logType == err {
-		l.log.Println(l.toString(``, color, message, params...))
-		return
-	}
-
-	l.log.Println(l.toString(``, color, message, params...))
+	l.log.Println(l.toString(logMsg, params...))
 }

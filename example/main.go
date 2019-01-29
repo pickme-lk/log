@@ -11,27 +11,27 @@ import (
 func main() {
 
 	// usage of log
-	log.Info(`info`)
-	log.Trace(`trace`)
-	log.Error(`error`)
-	log.Error(log.WithPrefix(`prefix`, `error`))
+	log.Info(`message`, `param1`, `param2`)
+	log.Trace(`message`)
+	log.Error(`message`)
+	log.Error(log.WithPrefix(`prefix`, `message`), `param1`, `param2`)
 
 	// log with a traceable context
 	tCtx := traceable_context.WithUUID(uuid.New())
 
 	ctx, _ := context.WithCancel(tCtx)
 
-	log.ErrorContext(ctx, `info`)
-	log.ErrorContext(ctx, `trace`)
-	log.ErrorContext(ctx, `error`)
-	log.ErrorContext(ctx, log.WithPrefix(`prefix`, `error`))
-	log.WarnContext(ctx, log.WithPrefix(`prefix`, `error`))
+	log.ErrorContext(ctx, `message`, `param1`, `param2`)
+	log.ErrorContext(ctx, `message`)
+	log.ErrorContext(ctx, `message`)
+	log.ErrorContext(ctx, log.WithPrefix(`prefix`, `message`))
+	log.WarnContext(ctx, log.WithPrefix(`prefix`, `message`), `param1`, `param2`)
 	// prefixed log
 	prefixedLogger := log.Constructor.PrefixedLog(log.WithLevel(log.ERROR))
-	prefixedLogger.Info(`module.Func`, `info`)
-	prefixedLogger.Trace(`module.Func`, `trace`)
-	prefixedLogger.Error(`module.Func`, `error`)
-	prefixedLogger.Error(`module.Func`, `error`)
+	prefixedLogger.Info(`module.Func`, `message`)
+	prefixedLogger.Trace(`module.Func`, `message`)
+	prefixedLogger.Error(`module.Func`, `message`)
+	prefixedLogger.Error(`module.Func`, `message`, `param1`, `param2`)
 	//
 	//// custom logger
 	logger := customLog.NewOtherLogger()
