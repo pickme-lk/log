@@ -36,13 +36,6 @@ func (l *logParser) colored(level Level) string {
 	return string(level)
 }
 
-func (l *logParser) toString(logMsg *logMessage, params ...interface{}) string {
-	if len(params) > 0 {
-		return fmt.Sprintf("%s [%s] [%+v on %s line %d] %+v", logMsg.typ, logMsg.uuid, logMsg.message, logMsg.file, logMsg.line, params)
-	}
-	return fmt.Sprintf("%s [%s] [%+v on %s line %d]", logMsg.typ, logMsg.uuid, logMsg.message, logMsg.file, logMsg.line)
-}
-
 func WithPrefix(p string, message interface{}) string {
 	return fmt.Sprintf(`%s] [%+v`, p, message)
 }
@@ -56,19 +49,15 @@ func uuidFromContext(ctx context.Context) uuid.UUID {
 	return uid
 }
 
-func (l *logParser) logEntry(level Level, ctx context.Context, message interface{}, params ...interface{}) {
+func (l *logParser) logEntry(level Level, ctx context.Context, message interface{}, prms ...interface{}) {
 
 	if !l.isLoggable(level) {
 		return
 	}
 
-	var uid uuid.UUID
+	format := "%s [%s] [%+v]"
 
-	if ctx != nil {
-		uid = uuidFromContext(ctx)
-	} else {
-		uid = uuid.New()
-	}
+	var params []interface{}
 
 	logLevel := string(level)
 
@@ -76,11 +65,20 @@ func (l *logParser) logEntry(level Level, ctx context.Context, message interface
 		logLevel = l.colored(level)
 	}
 
+	var uid uuid.UUID
+	if ctx != nil {
+		uid = uuidFromContext(ctx)
+	} else {
+		uid = uuid.New()
+	}
+
 	logMsg := &logMessage{
 		typ:     logLevel,
 		message: message,
 		uuid:    uid.String(),
 	}
+
+	params = append(params, logLevel, uid.String(), message)
 
 	if l.filePath {
 		_, f, l, ok := runtime.Caller(l.fileDepth)
@@ -92,15 +90,20 @@ func (l *logParser) logEntry(level Level, ctx context.Context, message interface
 		logMsg.file = f
 		logMsg.line = l
 
-		//message = fmt.Sprintf(`[%s] [%+v on %s %d]`, uid.String(), message, file, line)
+		format = "%s [%s] [%+v on %s line %d]"
 
-	} else {
-		//message = fmt.Sprintf(`[%s] [%+v]`, uid.String(), message)
+		params = append(params, f, l)
+
+	}
+
+	if len(prms) > 0 {
+		format = "%s [%s] [%+v on %s line %d] %+v"
+		params = append(params, prms)
 	}
 
 	if level == FATAL {
-		l.log.Fatalln(l.toString(logMsg, params...))
+		l.log.Fatalf(format, params...)
 	}
 
-	l.log.Println(l.toString(logMsg, params...))
+	l.log.Printf(format, params...)
 }

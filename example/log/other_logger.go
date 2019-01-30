@@ -11,6 +11,7 @@ func NewOtherLogger() OtherLogger {
 		log: log.Constructor.PrefixedLog(
 			log.WithLevel(log.INFO),
 			log.FileDepth(3),
+			log.WithFilePath(false),
 			log.Prefixed(`other log`),
 		),
 	}
