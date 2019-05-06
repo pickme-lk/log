@@ -3,8 +3,8 @@ package log
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	. "github.com/logrusorgru/aurora"
+	"io"
 	"log"
 	"os"
 )
@@ -73,30 +73,30 @@ const (
 )
 
 var (
-	fatal = `FATAL`
-	err   = `ERROR`
-	warn  = `WARN`
-	info  = `INFO`
-	debug = `DEBUG`
-	trace = `TRACE`
+//fatal = `FATAL`
+//err   = `ERROR`
+//warn  = `WARN`
+//info  = `INFO`
+//debug = `DEBUG`
+//trace = `TRACE`
 )
 
-var logColors = map[string]string{
-	`FATAL`: BgRed(`[FATAL]`).String(),
-	`ERROR`: BgRed(`[ERROR]`).String(),
-	`WARN`:  BgBrown(`[WARN]`).String(),
-	`INFO`:  BgBlue(`[INFO]`).String(),
-	`DEBUG`: BgCyan(`[DEBUG]`).String(),
-	`TRACE`: BgMagenta(`[TRACE]`).String(),
+var logColors = map[Level]string{
+	FATAL: BgRed(`[FATAL]`).String(),
+	ERROR: BgRed(`[ERROR]`).String(),
+	WARN:  BgBrown(`[WARN]`).String(),
+	INFO:  BgBlue(`[INFO]`).String(),
+	DEBUG: BgCyan(`[DEBUG]`).String(),
+	TRACE: BgMagenta(`[TRACE]`).String(),
 }
 
-var logTypes = map[string]int{
-	`FATAL`: 0,
-	`ERROR`: 1,
-	`WARN`:  2,
-	`INFO`:  3,
-	`DEBUG`: 4,
-	`TRACE`: 5,
+var logTypes = map[Level]int{
+	FATAL: 0,
+	ERROR: 1,
+	WARN:  2,
+	INFO:  3,
+	DEBUG: 4,
+	TRACE: 5,
 }
 
 type SimpleLogger interface {
@@ -154,7 +154,7 @@ func NewLog(options ...Option) Log {
 	opts.apply(options...)
 
 	return &logIpl{
-		log:        log.New(os.Stdout, ``, log.LstdFlags|log.Lmicroseconds),
+		log:        log.New(opts.writer, ``, log.LstdFlags|log.Lmicroseconds),
 		logOptions: opts,
 	}
 }
@@ -165,6 +165,7 @@ type logOptions struct {
 	logLevel  Level
 	filePath  bool
 	fileDepth int
+	writer    io.Writer
 }
 
 func (lOpts *logOptions) applyDefault() {
@@ -172,6 +173,7 @@ func (lOpts *logOptions) applyDefault() {
 	lOpts.colors = true
 	lOpts.logLevel = TRACE
 	lOpts.filePath = true
+	lOpts.writer = os.Stdout
 }
 
 func (lOpts *logOptions) copy() *logOptions {
@@ -180,6 +182,7 @@ func (lOpts *logOptions) copy() *logOptions {
 		colors:    lOpts.colors,
 		logLevel:  lOpts.logLevel,
 		filePath:  lOpts.filePath,
+		writer:    lOpts.writer,
 	}
 }
 
@@ -194,6 +197,12 @@ type Option func(*logOptions)
 func FileDepth(d int) Option {
 	return func(opts *logOptions) {
 		opts.fileDepth = d
+	}
+}
+
+func WithStdOut(w io.Writer) Option {
+	return func(opts *logOptions) {
+		opts.writer = w
 	}
 }
 
@@ -255,65 +264,65 @@ type logger struct {
 }
 
 func (l *logger) ErrorContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(err, uuidFromContext(ctx), message, l.colored(`ERROR`), params...)
+	l.logEntry(ERROR, ctx, message, params...)
 }
 
 func (l *logger) WarnContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(warn, uuidFromContext(ctx), message, l.colored(`WARN`), params...)
+	l.logEntry(WARN, ctx, message, params...)
 }
 
 func (l *logger) InfoContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(info, uuidFromContext(ctx), message, l.colored(`INFO`), params...)
+	l.logEntry(INFO, ctx, message, params...)
 }
 
 func (l *logger) DebugContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(debug, uuidFromContext(ctx), message, l.colored(`DEBUG`), params...)
+	l.logEntry(DEBUG, ctx, message, params...)
 }
 
 func (l *logger) TraceContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(trace, uuidFromContext(ctx), message, l.colored(`TRACE`), params...)
+	l.logEntry(TRACE, ctx, message, params...)
 }
 
 func (l *logger) Error(message interface{}, params ...interface{}) {
-	l.logEntry(err, uuid.New(), message, l.colored(`ERROR`), params...)
+	l.logEntry(ERROR, nil, message, params...)
 }
 
 func (l *logger) Warn(message interface{}, params ...interface{}) {
-	l.logEntry(warn, uuid.New(), message, l.colored(`WARN`), params...)
+	l.logEntry(WARN, nil, message, params...)
 }
 
 func (l *logger) Info(message interface{}, params ...interface{}) {
-	l.logEntry(info, uuid.New(), message, l.colored(`INFO`), params...)
+	l.logEntry(INFO, nil, message, params...)
 }
 
 func (l *logger) Debug(message interface{}, params ...interface{}) {
-	l.logEntry(debug, uuid.New(), message, l.colored(`DEBUG`), params...)
+	l.logEntry(DEBUG, nil, message, params...)
 }
 
 func (l *logger) Trace(message interface{}, params ...interface{}) {
-	l.logEntry(trace, uuid.New(), message, l.colored(`TRACE`), params...)
+	l.logEntry(TRACE, nil, message, params...)
 }
 
 func (l *logger) Fatal(message interface{}, params ...interface{}) {
-	l.logEntry(fatal, uuid.New(), message, l.colored(`FATAL`), params...)
+	l.logEntry(FATAL, nil, message, params...)
 }
 
 func (l *logger) Fatalln(message interface{}, params ...interface{}) {
-	l.logEntry(fatal, uuid.New(), message, l.colored(`FATAL`), params...)
+	l.logEntry(FATAL, nil, message, params...)
 }
 
 func (l *logger) FatalContext(ctx context.Context, message interface{}, params ...interface{}) {
-	l.logEntry(fatal, uuid.New(), message, l.colored(`FATAL`), params)
+	l.logEntry(FATAL, nil, message, params)
 }
 
 func (l *logger) Print(v ...interface{}) {
-	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
+	l.logEntry(INFO, nil, v, `INFO`)
 }
 
 func (l *logger) Printf(format string, v ...interface{}) {
-	l.logEntry(info, uuidFromContext(context.Background()), fmt.Sprintf(format, v), l.colored(`INFO`))
+	l.logEntry(INFO, nil, fmt.Sprintf(format, v...), `INFO`)
 }
 
 func (l *logger) Println(v ...interface{}) {
-	l.logEntry(info, uuidFromContext(context.Background()), v, l.colored(`INFO`))
+	l.logEntry(INFO, nil, v, `INFO`)
 }
