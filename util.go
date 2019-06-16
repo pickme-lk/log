@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	tContext "gitlab.mytaxi.lk/pickme/go-util/traceable_context"
+	tContext "github.com/pickme-go/traceable-context"
 	"log"
 	"runtime"
 )
@@ -50,7 +50,6 @@ func uuidFromContext(ctx context.Context) uuid.UUID {
 }
 
 func (l *logParser) logEntry(level Level, ctx context.Context, message interface{}, prms ...interface{}) {
-
 	if !l.isLoggable(level) {
 		return
 	}

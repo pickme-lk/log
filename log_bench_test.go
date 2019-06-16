@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/google/uuid"
-	"gitlab.mytaxi.lk/pickme/go-util/traceable_context"
+	"github.com/pickme-go/traceable-context"
 	"testing"
 )
 

@@ -1,6 +1,6 @@
 package log
 
-import "gitlab.mytaxi.lk/pickme/go/log"
+import "github.com/pickme-go/log"
 
 type OtherLogger struct {
 	log log.PrefixedLogger
