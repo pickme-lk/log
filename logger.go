@@ -15,6 +15,8 @@ var Constructor = NewLog(FileDepth(2))
 
 var StdLogger = Constructor.Log(FileDepth(3))
 
+var PrefixedStdLogger = Constructor.PrefixedLog(FileDepth(3))
+
 func Fatal(message interface{}, params ...interface{}) {
 	StdLogger.Fatal(message, params...)
 }
@@ -72,19 +74,10 @@ const (
 	TRACE Level = `TRACE`
 )
 
-var (
-//fatal = `FATAL`
-//err   = `ERROR`
-//warn  = `WARN`
-//info  = `INFO`
-//debug = `DEBUG`
-//trace = `TRACE`
-)
-
 var logColors = map[Level]string{
 	FATAL: BgRed(`[FATAL]`).String(),
 	ERROR: BgRed(`[ERROR]`).String(),
-	WARN:  BgBrown(`[WARN]`).String(),
+	WARN:  BgYellow(`[WARN]`).String(),
 	INFO:  BgBlue(`[INFO]`).String(),
 	DEBUG: BgCyan(`[DEBUG]`).String(),
 	TRACE: BgMagenta(`[TRACE]`).String(),
