@@ -71,5 +71,4 @@ func (l *prefixedLogger) Printf(format string, v ...interface{}) {
 
 func (l *prefixedLogger) Println(v ...interface{}) {
 	l.logEntry(INFO, nil, v, l.colored(`INFO`))
-
 }
