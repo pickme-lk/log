@@ -171,6 +171,7 @@ func (lOpts *logOptions) applyDefault() {
 
 func (lOpts *logOptions) copy() *logOptions {
 	return &logOptions{
+		prefix:    lOpts.prefix,
 		fileDepth: lOpts.fileDepth,
 		colors:    lOpts.colors,
 		logLevel:  lOpts.logLevel,

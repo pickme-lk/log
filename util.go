@@ -36,6 +36,13 @@ func (l *logParser) colored(level Level) string {
 	return string(level)
 }
 
+func (l *logParser) WithPrefix(p string, message interface{}) string {
+	if l.prefix != `` {
+		return fmt.Sprintf(`%s%s] [%+v`, l.prefix, p, message)
+	}
+	return fmt.Sprintf(`%s] [%+v`, p, message)
+}
+
 func WithPrefix(p string, message interface{}) string {
 	return fmt.Sprintf(`%s] [%+v`, p, message)
 }
