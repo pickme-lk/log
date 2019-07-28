@@ -38,7 +38,10 @@ func (l *logParser) colored(level Level) string {
 
 func (l *logParser) WithPrefix(p string, message interface{}) string {
 	if l.prefix != `` {
-		return fmt.Sprintf(`%s%s] [%+v`, l.prefix, p, message)
+		if p == `` {
+			return fmt.Sprintf(`%s] [%+v`, l.prefix, message)
+		}
+		return fmt.Sprintf(`%s.%s] [%+v`, l.prefix, p, message)
 	}
 	return fmt.Sprintf(`%s] [%+v`, p, message)
 }
@@ -84,26 +87,30 @@ func (l *logParser) logEntry(level Level, ctx context.Context, message interface
 		uuid:    uid.String(),
 	}
 
-	params = append(params, logLevel, uid.String(), message)
+	params = append(params, logLevel, uid.String(), fmt.Sprintf(`%s`, message))
 
 	if l.filePath {
-		_, f, l, ok := runtime.Caller(l.fileDepth)
+		pc, f, l, ok := runtime.Caller(l.fileDepth)
 		if !ok {
 			f = `<Unknown>`
 			l = 1
 		}
 
+		fnc := runtime.FuncForPC(pc)
+
 		logMsg.file = f
 		logMsg.line = l
 
-		format = "%s [%s] [%+v on %s line %d]"
+		//format = "%s [%s] [%+v on func %s %s line %d]"
+		format = "%s [%s] [%+v" + fmt.Sprintf(` on func %s %s line %d`, fnc.Name(), f, l) + "]"
 
-		params = append(params, f, l)
+		//params = append(params, )
 
 	}
 
 	if len(prms) > 0 {
-		format = "%s [%s] [%+v on %s line %d] %+v"
+		//format = "%s [%s] [%+v on func %s %s line %d] %+v"
+		format += " %+v"
 		params = append(params, prms)
 	}
 

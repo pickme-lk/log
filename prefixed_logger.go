@@ -72,3 +72,27 @@ func (l *prefixedLogger) Printf(format string, v ...interface{}) {
 func (l *prefixedLogger) Println(v ...interface{}) {
 	l.logEntry(INFO, nil, v, l.colored(`INFO`))
 }
+
+func (l *prefixedLogger) NewLog(opts ...Option) Logger {
+	defaults := l.logOptions.copy()
+	defaults.apply(opts...)
+
+	return &logger{
+		logParser: logParser{
+			logOptions: defaults,
+			log:        l.log,
+		},
+	}
+}
+
+func (l *prefixedLogger) NewPrefixedLog(opts ...Option) PrefixedLogger {
+	defaults := l.logOptions.copy()
+	defaults.apply(opts...)
+
+	return &prefixedLogger{
+		logParser: logParser{
+			logOptions: defaults,
+			log:        l.log,
+		},
+	}
+}

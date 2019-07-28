@@ -25,6 +25,8 @@ func (l *noopLogger) FatalContext(ctx context.Context, message interface{}, para
 func (l *noopLogger) Print(v ...interface{})                                                       {}
 func (l *noopLogger) Printf(format string, v ...interface{})                                       {}
 func (l *noopLogger) Println(v ...interface{})                                                     {}
+func (l *noopLogger) NewLog(opts ...Option) Logger                                                 { return NewNoopLogger() }
+func (l *noopLogger) NewPrefixedLog(opts ...Option) PrefixedLogger                                 { return NewPrefixedNoopLogger() }
 
 type prefixedNoopLogger struct{}
 
@@ -53,3 +55,8 @@ func (l *prefixedNoopLogger) FatalContext(ctx context.Context, prefix string, me
 func (l *prefixedNoopLogger) Print(v ...interface{})                 {}
 func (l *prefixedNoopLogger) Printf(format string, v ...interface{}) {}
 func (l *prefixedNoopLogger) Println(v ...interface{})               {}
+
+func (l *prefixedNoopLogger) NewLog(opts ...Option) Logger { return NewNoopLogger() }
+func (l *prefixedNoopLogger) NewPrefixedLog(opts ...Option) PrefixedLogger {
+	return NewPrefixedNoopLogger()
+}
