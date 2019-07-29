@@ -101,15 +101,10 @@ func (l *logParser) logEntry(level Level, ctx context.Context, message interface
 		logMsg.file = f
 		logMsg.line = l
 
-		//format = "%s [%s] [%+v on func %s %s line %d]"
 		format = "%s [%s] [%+v" + fmt.Sprintf(` on func %s %s line %d`, fnc.Name(), f, l) + "]"
-
-		//params = append(params, )
-
 	}
 
 	if len(prms) > 0 {
-		//format = "%s [%s] [%+v on func %s %s line %d] %+v"
 		format += " %+v"
 		params = append(params, prms)
 	}
