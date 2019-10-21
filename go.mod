@@ -1,4 +1,4 @@
-module github.com/pickme-go/log
+module github.com/pickme-go/log/v2
 
 go 1.13
 
