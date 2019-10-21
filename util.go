@@ -89,27 +89,23 @@ func (l *logParser) logEntry(level Level, ctx context.Context, message interface
 
 	params = append(params, logLevel, uid.String(), fmt.Sprintf(`%s`, message))
 
+	funcName := ``
+	file := `<Unknown>`
+	line := 1
+	pc, file, line, ok := runtime.Caller(l.fileDepth)
+	if ok {
+		funcName = runtime.FuncForPC(pc).Name()
+	}
+
+	format = "%s [%s] [%+v" + fmt.Sprintf(` on func %s`, funcName) + "]"
+
 	if l.filePath {
-		pc, f, l, ok := runtime.Caller(l.fileDepth)
-		if !ok {
-			f = `<Unknown>`
-			l = 1
-		}
-
-		fnc := runtime.FuncForPC(pc)
-
-		logMsg.file = f
-		logMsg.line = l
-
-		//format = "%s [%s] [%+v on func %s %s line %d]"
-		format = "%s [%s] [%+v" + fmt.Sprintf(` on func %s %s line %d`, fnc.Name(), f, l) + "]"
-
-		//params = append(params, )
-
+		logMsg.file = file
+		logMsg.line = line
+		format = "%s [%s] [%+v" + fmt.Sprintf(` on func %s on %s line %d`, funcName, file, line) + "]"
 	}
 
 	if len(prms) > 0 {
-		//format = "%s [%s] [%+v on func %s %s line %d] %+v"
 		format += " %+v"
 		params = append(params, prms)
 	}
